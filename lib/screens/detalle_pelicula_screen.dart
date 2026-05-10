@@ -7,6 +7,7 @@ import '../models/opinion.dart';
 import '../models/pelicula.dart';
 import '../repositories/opinion_repository.dart';
 import '../state/app_state.dart';
+import '../widgets/caratula_image.dart';
 import '../widgets/estrella_rating.dart';
 import '../widgets/opinion_tile.dart';
 import 'add_opinion_screen.dart';
@@ -154,10 +155,10 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Image.asset(
-                  widget.pelicula.caratula,
+                child: CaratulaImage(
+                  path: widget.pelicula.caratula,
+                  width: 180,
                   height: 250,
-                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 16),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/pelicula.dart';
+import 'caratula_image.dart';
 import 'estrella_rating.dart';
 
 class PeliculaCard extends StatelessWidget {
@@ -27,11 +28,10 @@ class PeliculaCard extends StatelessWidget {
             ClipRRect(
               borderRadius:
                   const BorderRadius.horizontal(left: Radius.circular(12)),
-              child: Image.asset(
-                pelicula.caratula,
+              child: CaratulaImage(
+                path: pelicula.caratula,
                 width: 100,
                 height: 140,
-                fit: BoxFit.cover,
               ),
             ),
             Expanded(

@@ -23,13 +23,19 @@ class AddPeliculaScreen extends StatefulWidget {
 
 class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
   final _formKey = GlobalKey<FormState>();
+  static const caratulasDisponibles = [
+    'assets/images/gladiator.jpg',
+    'assets/images/inception.jpg',
+    'assets/images/interstellar.jpg',
+    'assets/images/michael.jpg',
+  ];
 
   final tituloController = TextEditingController();
   final directorController = TextEditingController();
   final anioController = TextEditingController();
   final generoController = TextEditingController();
   final sinopsisController = TextEditingController();
-  final caratulaController = TextEditingController();
+  String caratulaSeleccionada = caratulasDisponibles.first;
 
   // Valida el formulario y guarda la película.
   Future<void> guardarPelicula() async {
@@ -40,7 +46,7 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
         anio: int.parse(anioController.text.trim()),
         genero: generoController.text.trim(),
         sinopsis: sinopsisController.text.trim(),
-        caratula: caratulaController.text.trim(),
+        caratula: caratulaSeleccionada,
       );
 
       await context.read<AppState>().addMovie(pelicula);
@@ -57,7 +63,9 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
       anioController.clear();
       generoController.clear();
       sinopsisController.clear();
-      caratulaController.clear();
+      setState(() {
+        caratulaSeleccionada = caratulasDisponibles.first;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -74,7 +82,6 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     anioController.dispose();
     generoController.dispose();
     sinopsisController.dispose();
-    caratulaController.dispose();
     super.dispose();
   }
 
@@ -158,12 +165,21 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
                     : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: caratulaController,
-                decoration: deco('Ruta de carátula (assets/images/...)'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Introduce la ruta de la carátula'
-                    : null,
+              DropdownButtonFormField<String>(
+                value: caratulaSeleccionada,
+                decoration: deco('Carátula'),
+                items: caratulasDisponibles.map((path) {
+                  return DropdownMenuItem(
+                    value: path,
+                    child: Text(path.split('/').last),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    caratulaSeleccionada = value;
+                  });
+                },
               ),
               const SizedBox(height: 20),
               ElevatedButton(
