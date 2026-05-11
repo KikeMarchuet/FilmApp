@@ -59,6 +59,8 @@ class AppLocalizations {
       'deleteMovieMessage': 'Vols esborrar aquesta pel·lícula?',
       'cancel': 'Cancel·lar',
       'delete': 'Esborrar',
+      'searchMovie': 'Buscar pel·lícula',
+      'noSearchResults': 'No hi ha pel·lícules amb aquest text.',
     },
     'es': {
       'appTitle': 'FilmApp',
@@ -97,6 +99,8 @@ class AppLocalizations {
       'deleteMovieMessage': '¿Quieres borrar esta película?',
       'cancel': 'Cancelar',
       'delete': 'Borrar',
+      'searchMovie': 'Buscar película',
+      'noSearchResults': 'No hay películas con ese texto.',
     },
     'en': {
       'appTitle': 'FilmApp',
@@ -135,6 +139,8 @@ class AppLocalizations {
       'deleteMovieMessage': 'Do you want to delete this movie?',
       'cancel': 'Cancel',
       'delete': 'Delete',
+      'searchMovie': 'Search movie',
+      'noSearchResults': 'No movies match that text.',
     },
   };
 

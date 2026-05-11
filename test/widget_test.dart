@@ -58,6 +58,15 @@ void main() {
     expect(find.text('Tester'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
 
+    await tester.enterText(find.byType(TextField), 'inter');
+    await tester.pump();
+
+    expect(find.text('Interstellar'), findsOneWidget);
+    expect(find.text('Inception'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pump();
+
     await tester.tap(find.text('Interstellar'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Marcar com a preferida'));

@@ -29,6 +29,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final searchController = TextEditingController();
+  String searchText = '';
+
+  @override
+  // Libera el controlador de búsqueda.
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   // Abre la pantalla para añadir una película.
   Future<void> abrirAltaPelicula() async {
     await Navigator.push(
@@ -52,6 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Actualiza el texto usado para filtrar el listado.
+  void buscarPeliculas(String value) {
+    setState(() {
+      searchText = value.trim().toLowerCase();
+    });
+  }
+
   // Muestra el listado de películas o favoritas.
   @override
   Widget build(BuildContext context) {
@@ -66,6 +83,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final appState = context.watch<AppState>();
     final listState =
         widget.onlyFavorites ? appState.favoriteMovies : appState.allMovies;
+    final peliculasFiltradas = searchText.isEmpty
+        ? listState.peliculas
+        : listState.peliculas
+            .where(
+              (pelicula) => pelicula.titulo.toLowerCase().contains(searchText),
+            )
+            .toList();
+    final listIsEmpty = listState.peliculas.isEmpty;
+    final filteredListIsEmpty = peliculasFiltradas.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -85,21 +111,51 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: listState.loading
           ? const Center(child: CircularProgressIndicator())
-          : listState.peliculas.isEmpty
-              ? Center(child: Text(emptyMessage))
-              : ListView.builder(
-                  itemCount: listState.peliculas.length,
-                  itemBuilder: (context, index) {
-                    final pelicula = listState.peliculas[index];
-                    final media = listState.medias[pelicula.id] ?? 0.0;
-
-                    return PeliculaCard(
-                      pelicula: pelicula,
-                      media: media,
-                      onTap: () => abrirDetalle(pelicula),
-                    );
-                  },
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: l10n.text('searchMovie'),
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: searchText.isEmpty
+                          ? null
+                          : IconButton(
+                              onPressed: () {
+                                searchController.clear();
+                                buscarPeliculas('');
+                              },
+                              icon: const Icon(Icons.clear),
+                            ),
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: buscarPeliculas,
+                  ),
                 ),
+                Expanded(
+                  child: listIsEmpty
+                      ? Center(child: Text(emptyMessage))
+                      : filteredListIsEmpty
+                          ? Center(child: Text(l10n.text('noSearchResults')))
+                          : ListView.builder(
+                              itemCount: peliculasFiltradas.length,
+                              itemBuilder: (context, index) {
+                                final pelicula = peliculasFiltradas[index];
+                                final media =
+                                    listState.medias[pelicula.id] ?? 0.0;
+
+                                return PeliculaCard(
+                                  pelicula: pelicula,
+                                  media: media,
+                                  onTap: () => abrirDetalle(pelicula),
+                                );
+                              },
+                            ),
+                ),
+              ],
+            ),
       floatingActionButton: widget.showAddButton
           ? FloatingActionButton(
               onPressed: abrirAltaPelicula,
