@@ -29,6 +29,11 @@ void main() {
     await tester.pumpWidget(const FilmApp());
     await tester.pump();
 
+    expect(find.text('FilmApp'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pump();
+
     expect(find.text('Inicia sessió'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(TextButton, 'Crear usuari'));
