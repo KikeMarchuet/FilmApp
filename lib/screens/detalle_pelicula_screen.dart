@@ -11,6 +11,7 @@ import '../widgets/caratula_image.dart';
 import '../widgets/estrella_rating.dart';
 import '../widgets/opinion_tile.dart';
 import 'add_opinion_screen.dart';
+import 'add_pelicula_screen.dart';
 
 class DetallePeliculaScreen extends StatefulWidget {
   final Pelicula pelicula;
@@ -62,6 +63,19 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
       ),
     );
     cargarOpiniones();
+  }
+
+  // Abre el formulario para editar la película.
+  Future<void> abrirEdicion(Pelicula pelicula) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddPeliculaScreen(
+          user: widget.user,
+          pelicula: pelicula,
+        ),
+      ),
+    );
   }
 
   // Marca o desmarca la película como favorita.
@@ -120,7 +134,7 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.pelicula.titulo),
+        title: Text(peliculaActual.titulo),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -142,6 +156,11 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
                 : l10n.text('markFavorite'),
           ),
           IconButton(
+            onPressed: () => abrirEdicion(peliculaActual),
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: l10n.text('editMovie'),
+          ),
+          IconButton(
             onPressed: confirmarBorrado,
             icon: const Icon(Icons.delete_outline),
             tooltip: l10n.text('deleteMovie'),
@@ -156,30 +175,30 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
             children: [
               Center(
                 child: CaratulaImage(
-                  path: widget.pelicula.caratula,
+                  path: peliculaActual.caratula,
                   width: 180,
                   height: 250,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                widget.pelicula.titulo,
+                peliculaActual.titulo,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              Text('Director: ${widget.pelicula.director}'),
-              Text('Año: ${widget.pelicula.anio}'),
-              Text('Género: ${widget.pelicula.genero}'),
+              Text('Director: ${peliculaActual.director}'),
+              Text('Año: ${peliculaActual.anio}'),
+              Text('Género: ${peliculaActual.genero}'),
               const SizedBox(height: 12),
               const Text(
                 'Sinopsis',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              Text(widget.pelicula.sinopsis),
+              Text(peliculaActual.sinopsis),
               const SizedBox(height: 16),
               Row(
                 children: [

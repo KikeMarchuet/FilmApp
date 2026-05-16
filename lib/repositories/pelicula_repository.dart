@@ -39,6 +39,17 @@ class PeliculaRepository {
     return await db.insert('peliculas', pelicula.toMap());
   }
 
+  // Actualiza los datos principales de una película existente.
+  Future<void> updatePelicula(Pelicula pelicula) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'peliculas',
+      pelicula.toMap(),
+      where: 'id = ?',
+      whereArgs: [pelicula.id],
+    );
+  }
+
   // Elimina una película y sus datos relacionados.
   Future<void> deletePelicula(int id) async {
     final db = await DatabaseHelper.instance.database;

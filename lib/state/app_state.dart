@@ -132,6 +132,14 @@ class AppState extends ChangeNotifier {
     await loadMovies();
   }
 
+  // Actualiza una película existente y refresca las listas.
+  Future<void> updateMovie(Pelicula pelicula) async {
+    if (pelicula.id == null) return;
+
+    await peliculaRepository.updatePelicula(pelicula);
+    await loadMovies();
+  }
+
   // Borra una película y actualiza las listas.
   Future<void> deleteMovie(Pelicula pelicula) async {
     final id = pelicula.id;

@@ -9,12 +9,14 @@ import '../state/app_state.dart';
 class AddPeliculaScreen extends StatefulWidget {
   final AppUser? user;
   final bool closeAfterSave;
+  final Pelicula? pelicula;
 
-  // Crea la pantalla para añadir una película.
+  // Crea la pantalla para añadir o editar una película.
   const AddPeliculaScreen({
     super.key,
     this.user,
     this.closeAfterSave = true,
+    this.pelicula,
   });
 
   @override
@@ -37,22 +39,47 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
   final sinopsisController = TextEditingController();
   String caratulaSeleccionada = caratulasDisponibles.first;
 
+  bool get esEdicion => widget.pelicula != null;
+
+  // Carga los datos iniciales cuando se está editando una película.
+  @override
+  void initState() {
+    super.initState();
+    final pelicula = widget.pelicula;
+    if (pelicula == null) return;
+
+    tituloController.text = pelicula.titulo;
+    directorController.text = pelicula.director;
+    anioController.text = pelicula.anio.toString();
+    generoController.text = pelicula.genero;
+    sinopsisController.text = pelicula.sinopsis;
+    if (caratulasDisponibles.contains(pelicula.caratula)) {
+      caratulaSeleccionada = pelicula.caratula;
+    }
+  }
+
   // Valida el formulario y guarda la película.
   Future<void> guardarPelicula() async {
     if (_formKey.currentState!.validate()) {
       final pelicula = Pelicula(
+        id: widget.pelicula?.id,
         titulo: tituloController.text.trim(),
         director: directorController.text.trim(),
         anio: int.parse(anioController.text.trim()),
         genero: generoController.text.trim(),
         sinopsis: sinopsisController.text.trim(),
         caratula: caratulaSeleccionada,
+        favorita: widget.pelicula?.favorita ?? false,
       );
 
-      await context.read<AppState>().addMovie(pelicula);
+      if (esEdicion) {
+        await context.read<AppState>().updateMovie(pelicula);
+      } else {
+        await context.read<AppState>().addMovie(pelicula);
+      }
 
       if (!mounted) return;
-      if (widget.closeAfterSave) {
+      if (widget.closeAfterSave || esEdicion) {
         Navigator.pop(context);
         return;
       }
@@ -93,14 +120,14 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     );
   }
 
-  // Muestra el formulario para crear una película.
+  // Muestra el formulario para crear o editar una película.
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.text('newMovie')),
+        title: Text(esEdicion ? l10n.text('editMovie') : l10n.text('newMovie')),
         actions: [
           if (widget.user != null)
             Padding(
@@ -184,7 +211,9 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: guardarPelicula,
-                child: const Text('Guardar película'),
+                child: Text(
+                  esEdicion ? l10n.text('saveChanges') : 'Guardar película',
+                ),
               ),
             ],
           ),
