@@ -36,15 +36,16 @@ class Pelicula {
 
   // Crea una instancia de Pelicula a partir de un mapa obtenido de la base de datos
   factory Pelicula.fromMap(Map<String, dynamic> map) {
+    final favorita = map['favorita'];
     return Pelicula(
-      id: map['id'],
+      id: (map['id'] as num?)?.toInt(),
       titulo: map['titulo'],
       director: map['director'],
-      anio: map['anio'],
+      anio: (map['anio'] as num).toInt(),
       genero: map['genero'],
       sinopsis: map['sinopsis'],
       caratula: map['caratula'],
-      favorita: (map['favorita'] ?? 0) == 1,
+      favorita: favorita == true || favorita == 1,
     );
   }
 }

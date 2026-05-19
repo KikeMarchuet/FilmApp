@@ -73,7 +73,8 @@ class AppState extends ChangeNotifier {
   }
 
   // Cierra la sesión y limpia los datos cargados en memoria.
-  void logout() {
+  Future<void> logout() async {
+    await authRepository.logout();
     _user = null;
     _allMovies = const MovieListState(loading: true);
     _favoriteMovies = const MovieListState(loading: true);

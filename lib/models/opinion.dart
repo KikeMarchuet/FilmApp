@@ -28,11 +28,11 @@ class Opinion {
   // Crea una instancia de Opinion a partir de un mapa obtenido de la base de datos
   factory Opinion.fromMap(Map<String, dynamic> map) {
     return Opinion(
-      id: map['id'],
-      peliculaId: map['pelicula_id'],
+      id: (map['id'] as num?)?.toInt(),
+      peliculaId: (map['pelicula_id'] as num).toInt(),
       autor: map['autor'],
       comentario: map['comentario'],
-      valoracion: map['valoracion'],
+      valoracion: (map['valoracion'] as num).toInt(),
     );
   }
 }
