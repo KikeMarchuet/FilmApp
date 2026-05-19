@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "727116770605",
+    "project_id": "filmapp-ac786",
+    "storage_bucket": "filmapp-ac786.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727116770605:android:8f444452746845590637a4",
+        "android_client_info": {
+          "package_name": "com.kike.film_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5buAru-rneDY7GaCXOD4FbJa6SW4Lx4Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

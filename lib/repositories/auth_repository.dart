@@ -13,6 +13,8 @@ enum AuthResult {
   success,
   invalidCredentials,
   userAlreadyExists,
+  weakPassword,
+  authError,
 }
 
 class AuthResponse {
@@ -134,7 +136,9 @@ class AuthRepository {
             error.code == 'invalid-email') {
           return const AuthResponse(result: AuthResult.invalidCredentials);
         }
-        rethrow;
+        return const AuthResponse(result: AuthResult.authError);
+      } catch (_) {
+        return const AuthResponse(result: AuthResult.authError);
       }
     }
 
@@ -184,7 +188,15 @@ class AuthRepository {
         if (error.code == 'email-already-in-use') {
           return const AuthResponse(result: AuthResult.userAlreadyExists);
         }
-        rethrow;
+        if (error.code == 'weak-password') {
+          return const AuthResponse(result: AuthResult.weakPassword);
+        }
+        if (error.code == 'invalid-email') {
+          return const AuthResponse(result: AuthResult.invalidCredentials);
+        }
+        return const AuthResponse(result: AuthResult.authError);
+      } catch (_) {
+        return const AuthResponse(result: AuthResult.authError);
       }
     }
 

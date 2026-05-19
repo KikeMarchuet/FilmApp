@@ -1,5 +1,1 @@
-{
-  "firestore": {
-    "rules": "firestore.rules"
-  }
-}
+{"firestore":{"rules":"firestore.rules"},"flutter":{"platforms":{"android":{"default":{"projectId":"filmapp-ac786","appId":"1:727116770605:android:8f444452746845590637a4","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"filmapp-ac786","appId":"1:727116770605:ios:e06e47f07f859e0c0637a4","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"filmapp-ac786","configurations":{"android":"1:727116770605:android:8f444452746845590637a4","ios":"1:727116770605:ios:e06e47f07f859e0c0637a4","web":"1:727116770605:web:769c6cb8020851d90637a4"}}}}}}

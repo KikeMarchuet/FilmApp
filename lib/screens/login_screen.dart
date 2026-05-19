@@ -40,16 +40,21 @@ class _LoginScreenState extends State<LoginScreen> {
       errorKey = null;
     });
 
-    final appState = context.read<AppState>();
-    final response = isRegisterMode
-        ? await appState.register(
-            userController.text,
-            passwordController.text,
-          )
-        : await appState.login(
-            userController.text,
-            passwordController.text,
-          );
+    AuthResponse response;
+    try {
+      final appState = context.read<AppState>();
+      response = isRegisterMode
+          ? await appState.register(
+              userController.text,
+              passwordController.text,
+            )
+          : await appState.login(
+              userController.text,
+              passwordController.text,
+            );
+    } catch (_) {
+      response = const AuthResponse(result: AuthResult.authError);
+    }
 
     if (!mounted) return;
     setState(() {
@@ -61,6 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       errorKey = switch (response.result) {
         AuthResult.userAlreadyExists => 'userAlreadyExists',
+        AuthResult.weakPassword => 'weakPassword',
+        AuthResult.authError => 'authError',
         _ => 'invalidCredentials',
       };
     });
@@ -114,6 +121,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: userController,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
                     decoration: InputDecoration(
                       labelText: l10n.text('userName'),
                       border: const OutlineInputBorder(),
