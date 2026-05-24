@@ -5,7 +5,7 @@ class Opinion {
   final String comentario;
   final int valoracion;
 
-  // Crea una opinión asociada a una película.
+  // Crea una opinión asociada a una película
   Opinion({
     this.id,
     required this.peliculaId,

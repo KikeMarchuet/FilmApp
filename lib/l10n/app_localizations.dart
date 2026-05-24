@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class AppLocalizations {
   final Locale locale;
 
-  // Guarda el idioma que se usará para buscar textos.
+  // Guarda el idioma que se usará para buscar textos
   AppLocalizations(this.locale);
 
   static const supportedLocales = [
@@ -13,7 +13,7 @@ class AppLocalizations {
     Locale('en'),
   ];
 
-  // Obtiene las traducciones desde el contexto actual.
+  // Obtiene las traducciones desde el contexto actual
   static AppLocalizations of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
@@ -156,12 +156,12 @@ class AppLocalizations {
     },
   };
 
-  // Devuelve el texto traducido para una clave.
+  // Devuelve el texto traducido para una clave
   String text(String key) {
     return _values[locale.languageCode]?[key] ?? _values['ca']![key] ?? key;
   }
 
-  // Devuelve el texto de sesión iniciada con el nombre del usuario.
+  // Devuelve el texto de sesión iniciada con el nombre del usuario
   String loggedInAs(String user) {
     return Intl.message(
       text('loggedInAs').replaceFirst('{user}', user),
@@ -173,11 +173,11 @@ class AppLocalizations {
 
 class _AppLocalizationsDelegate
     extends LocalizationsDelegate<AppLocalizations> {
-  // Crea el delegado que Flutter usa para cargar traducciones.
+  // Crea el delegado que Flutter usa para cargar traducciones
   const _AppLocalizationsDelegate();
 
   @override
-  // Indica si el idioma solicitado está soportado.
+  // Indica si el idioma solicitado está soportado
   bool isSupported(Locale locale) {
     return AppLocalizations.supportedLocales
         .map((supportedLocale) => supportedLocale.languageCode)
@@ -185,13 +185,13 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  // Carga las traducciones para el idioma activo.
+  // Carga las traducciones para el idioma activo
   Future<AppLocalizations> load(Locale locale) async {
     Intl.defaultLocale = locale.languageCode;
     return AppLocalizations(locale);
   }
 
   @override
-  // Evita recargar el delegado si no ha cambiado.
+  // Evita recargar el delegado si no ha cambiado
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }

@@ -8,9 +8,10 @@ import 'home_screen.dart';
 import 'settings_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  // Crea la pantalla con navegación inferior.
+  // Crea la pantalla con navegación inferior
   const MainNavigationScreen({super.key});
 
+  // Crea el estado de la navegación principal
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
@@ -18,14 +19,14 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int selectedIndex = 0;
 
-  // Cambia la pestaña activa.
+  // Cambia la pestaña activa
   void changeSection(int index) {
     setState(() {
       selectedIndex = index;
     });
   }
 
-  // Muestra las pestañas principales de la app.
+  // Muestra las pestañas principales de la app
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

@@ -5,10 +5,10 @@ import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 
 class SettingsScreen extends StatelessWidget {
-  // Crea la pantalla de configuración.
+  // Crea la pantalla de configuración
   const SettingsScreen({super.key});
 
-  // Muestra usuario, idioma y cierre de sesión.
+  // Muestra usuario, idioma y cierre de sesión
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

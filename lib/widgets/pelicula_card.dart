@@ -8,7 +8,7 @@ class PeliculaCard extends StatelessWidget {
   final double media;
   final VoidCallback onTap;
 
-  // Crea una tarjeta de película para el listado.
+  // Crea una tarjeta de película para el listado
   const PeliculaCard({
     super.key,
     required this.pelicula,
@@ -16,7 +16,7 @@ class PeliculaCard extends StatelessWidget {
     required this.onTap,
   });
 
-  // Muestra la información básica de una película.
+  // Muestra la información básica de una película
   @override
   Widget build(BuildContext context) {
     return Card(

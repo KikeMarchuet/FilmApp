@@ -5,10 +5,10 @@ import 'estrella_rating.dart';
 class OpinionTile extends StatelessWidget {
   final Opinion opinion;
 
-  // Crea una tarjeta para mostrar una opinión.
+  // Crea una tarjeta para mostrar una opinión
   const OpinionTile({super.key, required this.opinion});
 
-  // Muestra autor, valoración y comentario.
+  // Muestra autor, valoración y comentario
   @override
   Widget build(BuildContext context) {
     return Card(

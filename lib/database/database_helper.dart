@@ -5,17 +5,17 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
-  // Evita crear instancias desde fuera de esta clase.
+  // Evita crear instancias desde fuera de esta clase
   DatabaseHelper._init();
 
-  // Devuelve la base de datos abierta o la crea si aún no existe.
+  // Devuelve la base de datos abierta o la crea si aún no existe
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB('filmapp.db');
     return _database!;
   }
 
-  // Prepara la ruta del archivo y abre la base de datos.
+  // Prepara la ruta del archivo y abre la base de datos
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
@@ -28,7 +28,7 @@ class DatabaseHelper {
     );
   }
 
-  // Crea todas las tablas cuando la base de datos es nueva.
+  // Crea todas las tablas cuando la base de datos es nueva
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE peliculas (
@@ -76,7 +76,7 @@ class DatabaseHelper {
     await _insertarDatosIniciales(db);
   }
 
-  // Aplica cambios de estructura a bases de datos ya existentes.
+  // Aplica cambios de estructura a bases de datos ya existentes
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
@@ -93,7 +93,7 @@ class DatabaseHelper {
     }
   }
 
-  // Crea las tablas de usuarios y favoritas si no existen.
+  // Crea las tablas de usuarios y favoritas si no existen
   Future<void> _createUserTables(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS usuarios (
@@ -115,7 +115,7 @@ class DatabaseHelper {
     ''');
   }
 
-  // Inserta películas y opiniones de ejemplo al crear la base de datos.
+  // Inserta películas y opiniones de ejemplo al crear la base de datos
   Future<void> _insertarDatosIniciales(Database db) async {
     await db.insert('peliculas', {
       'titulo': 'Interstellar',

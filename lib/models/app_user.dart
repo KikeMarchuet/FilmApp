@@ -4,7 +4,7 @@ class AppUser {
   final String languageCode;
   final String? firebaseUid;
 
-  // Crea un usuario con su idioma guardado.
+  // Crea un usuario con su idioma guardado
   const AppUser({
     required this.id,
     required this.name,
@@ -12,7 +12,7 @@ class AppUser {
     this.firebaseUid,
   });
 
-  // Crea un usuario a partir de una fila de la base de datos.
+  // Crea un usuario a partir de una fila de la base de datos
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       id: map['id'],
@@ -22,7 +22,7 @@ class AppUser {
     );
   }
 
-  // Devuelve una copia cambiando solo los datos indicados.
+  // Devuelve una copia cambiando solo los datos indicados
   AppUser copyWith({
     String? languageCode,
     String? firebaseUid,

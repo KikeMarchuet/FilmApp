@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Devuelve el tema visual principal de la app.
+  // Devuelve el tema visual principal de la app
   static ThemeData get lightTheme {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

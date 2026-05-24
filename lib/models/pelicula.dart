@@ -8,7 +8,7 @@ class Pelicula {
   final String caratula;
   final bool favorita;
 
-  // Crea una película con sus datos principales.
+  // Crea una película con sus datos principales
   Pelicula({
     this.id,
     required this.titulo,

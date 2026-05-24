@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
   final bool onlyFavorites;
   final bool showAddButton;
 
-  // Crea una pantalla de listado de películas.
+  // Crea una pantalla de listado de películas
   const HomeScreen({
     super.key,
     required this.user,
@@ -24,22 +24,23 @@ class HomeScreen extends StatefulWidget {
     this.showAddButton = true,
   });
 
+  // Crea el estado del listado de películas
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final searchController = TextEditingController();
-  String searchText = '';
+  final controladorBusqueda = TextEditingController();
+  String textoBusqueda = '';
 
   @override
-  // Libera el controlador de búsqueda.
+  // Libera el controlador de búsqueda
   void dispose() {
-    searchController.dispose();
+    controladorBusqueda.dispose();
     super.dispose();
   }
 
-  // Abre la pantalla para añadir una película.
+  // Abre la pantalla para añadir una película
   Future<void> abrirAltaPelicula() async {
     await Navigator.push(
       context,
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Abre el detalle de la película seleccionada.
+  // Abre el detalle de la película seleccionada
   Future<void> abrirDetalle(Pelicula pelicula) async {
     await Navigator.push(
       context,
@@ -62,40 +63,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Actualiza el texto usado para filtrar el listado.
+  // Actualiza el texto usado para filtrar el listado
   void buscarPeliculas(String value) {
     setState(() {
-      searchText = value.trim().toLowerCase();
+      textoBusqueda = value.trim().toLowerCase();
     });
   }
 
-  // Muestra el listado de películas o favoritas.
+  // Muestra el listado de películas o favoritas
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final screenTitle = widget.title.isNotEmpty
+    final tituloPantalla = widget.title.isNotEmpty
         ? widget.title
         : widget.onlyFavorites
             ? l10n.text('favoriteMovies')
             : l10n.text('moviesList');
-    final emptyMessage =
+    final mensajeVacio =
         widget.onlyFavorites ? l10n.text('noFavorites') : l10n.text('noMovies');
     final appState = context.watch<AppState>();
-    final listState =
-        widget.onlyFavorites ? appState.favoriteMovies : appState.allMovies;
-    final peliculasFiltradas = searchText.isEmpty
-        ? listState.peliculas
-        : listState.peliculas
+    final estadoLista = widget.onlyFavorites
+        ? appState.peliculasFavoritas
+        : appState.todasLasPeliculas;
+    final peliculasFiltradas = textoBusqueda.isEmpty
+        ? estadoLista.peliculas
+        : estadoLista.peliculas
             .where(
-              (pelicula) => pelicula.titulo.toLowerCase().contains(searchText),
+              (pelicula) =>
+                  pelicula.titulo.toLowerCase().contains(textoBusqueda),
             )
             .toList();
-    final listIsEmpty = listState.peliculas.isEmpty;
-    final filteredListIsEmpty = peliculasFiltradas.isEmpty;
+    final listaVacia = estadoLista.peliculas.isEmpty;
+    final listaFiltradaVacia = peliculasFiltradas.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(screenTitle),
+        title: Text(tituloPantalla),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -109,22 +112,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: listState.loading
+      body: estadoLista.cargando
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
                   child: TextField(
-                    controller: searchController,
+                    controller: controladorBusqueda,
                     decoration: InputDecoration(
                       labelText: l10n.text('searchMovie'),
                       prefixIcon: const Icon(Icons.search),
-                      suffixIcon: searchText.isEmpty
+                      suffixIcon: textoBusqueda.isEmpty
                           ? null
                           : IconButton(
                               onPressed: () {
-                                searchController.clear();
+                                controladorBusqueda.clear();
                                 buscarPeliculas('');
                               },
                               icon: const Icon(Icons.clear),
@@ -135,16 +138,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Expanded(
-                  child: listIsEmpty
-                      ? Center(child: Text(emptyMessage))
-                      : filteredListIsEmpty
+                  child: listaVacia
+                      ? Center(child: Text(mensajeVacio))
+                      : listaFiltradaVacia
                           ? Center(child: Text(l10n.text('noSearchResults')))
                           : ListView.builder(
                               itemCount: peliculasFiltradas.length,
                               itemBuilder: (context, index) {
                                 final pelicula = peliculasFiltradas[index];
                                 final media =
-                                    listState.medias[pelicula.id] ?? 0.0;
+                                    estadoLista.medias[pelicula.id] ?? 0.0;
 
                                 return PeliculaCard(
                                   pelicula: pelicula,

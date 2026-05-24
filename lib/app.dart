@@ -10,9 +10,10 @@ import 'state/app_state.dart';
 import 'utils/app_theme.dart';
 
 class FilmApp extends StatefulWidget {
-  // Crea el widget principal de la app.
+  // Crea el widget principal de la app
   const FilmApp({super.key});
 
+  // Crea el estado interno de la app
   @override
   State<FilmApp> createState() => _FilmAppState();
 }
@@ -20,14 +21,14 @@ class FilmApp extends StatefulWidget {
 class _FilmAppState extends State<FilmApp> {
   bool showSplash = true;
 
-  // Oculta la pantalla inicial y muestra la app.
+  // Oculta la pantalla inicial y muestra la app
   void finishSplash() {
     setState(() {
       showSplash = false;
     });
   }
 
-  // Monta Provider, localización, tema y pantalla inicial.
+  // Monta Provider, localización, tema y pantalla inicial
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

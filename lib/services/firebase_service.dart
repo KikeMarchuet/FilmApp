@@ -7,12 +7,16 @@ class FirebaseService {
   static bool _isAvailable = false;
   static Object? _initializationError;
 
+  // Evita crear instancias del servicio
   FirebaseService._();
 
+  // Indica si Firebase está disponible
   static bool get isAvailable => _isAvailable;
+
+  // Devuelve el error de inicialización si lo hubo
   static Object? get initializationError => _initializationError;
 
-  // Inicializa Firebase si la app ya tiene configuración nativa o web.
+  // Inicializa Firebase si la app ya tiene configuración nativa o web
   static Future<void> initialize() async {
     try {
       await Firebase.initializeApp(

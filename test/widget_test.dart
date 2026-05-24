@@ -6,10 +6,11 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:film_app/app.dart';
 
-// Comprueba el flujo principal de la app en un test de widgets.
+// Comprueba el flujo principal de la app en un test de widgets
 void main() {
   late Directory databaseDirectory;
 
+  // Prepara SQLite en memoria para los tests
   setUpAll(() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfiNoIsolate;
@@ -18,12 +19,14 @@ void main() {
     await databaseFactory.setDatabasesPath(databaseDirectory.path);
   });
 
+  // Borra la base temporal al terminar los tests
   tearDownAll(() async {
     if (await databaseDirectory.exists()) {
       await databaseDirectory.delete(recursive: true);
     }
   });
 
+  // Comprueba el flujo principal visible de FilmApp
   testWidgets('FilmApp starts with bottom navigation',
       (WidgetTester tester) async {
     await tester.pumpWidget(const FilmApp());

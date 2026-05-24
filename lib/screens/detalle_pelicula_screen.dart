@@ -17,13 +17,14 @@ class DetallePeliculaScreen extends StatefulWidget {
   final Pelicula pelicula;
   final AppUser user;
 
-  // Crea la pantalla de detalle de una película.
+  // Crea la pantalla de detalle de una película
   const DetallePeliculaScreen({
     super.key,
     required this.pelicula,
     required this.user,
   });
 
+  // Crea el estado de la pantalla de detalle
   @override
   State<DetallePeliculaScreen> createState() => _DetallePeliculaScreenState();
 }
@@ -34,19 +35,19 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
   List<Opinion> opiniones = [];
   double media = 0.0;
 
-  // Carga las opiniones al abrir la pantalla.
+  // Carga las opiniones al abrir la pantalla
   @override
   void initState() {
     super.initState();
     cargarOpiniones();
   }
 
-  // Obtiene opiniones y media de valoración.
+  // Obtiene opiniones y media de valoración
   Future<void> cargarOpiniones() async {
-    final data =
-        await opinionRepository.getOpinionesByPelicula(widget.pelicula.id!);
+    final data = await opinionRepository
+        .obtenerOpinionesPorPelicula(widget.pelicula.id!);
     final mediaCalculada =
-        await opinionRepository.getMediaValoracion(widget.pelicula.id!);
+        await opinionRepository.obtenerMediaValoracion(widget.pelicula.id!);
 
     setState(() {
       opiniones = data;
@@ -54,7 +55,7 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
     });
   }
 
-  // Abre la pantalla para añadir una opinión.
+  // Abre la pantalla para añadir una opinión
   Future<void> abrirAltaOpinion() async {
     await Navigator.push(
       context,
@@ -65,7 +66,7 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
     cargarOpiniones();
   }
 
-  // Abre el formulario para editar la película.
+  // Abre el formulario para editar la película
   Future<void> abrirEdicion(Pelicula pelicula) async {
     await Navigator.push(
       context,
@@ -78,12 +79,12 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
     );
   }
 
-  // Marca o desmarca la película como favorita.
+  // Marca o desmarca la película como favorita
   Future<void> cambiarFavorita() async {
-    await context.read<AppState>().toggleFavorite(_peliculaActual(context));
+    await context.read<AppState>().cambiarFavorita(_peliculaActual(context));
   }
 
-  // Pide confirmación y borra la película si el usuario acepta.
+  // Pide confirmación y borra la película si el usuario acepta
   Future<void> confirmarBorrado() async {
     final l10n = AppLocalizations.of(context);
     final shouldDelete = await showDialog<bool>(
@@ -108,26 +109,26 @@ class _DetallePeliculaScreenState extends State<DetallePeliculaScreen> {
 
     if (shouldDelete != true || !mounted) return;
 
-    await context.read<AppState>().deleteMovie(_peliculaActual(context));
+    await context.read<AppState>().eliminarPelicula(_peliculaActual(context));
     if (!mounted) return;
     Navigator.pop(context);
   }
 
-  // Busca la versión más actual de la película en el estado global.
+  // Busca la versión más actual de la película en el estado global
   Pelicula _peliculaActual(BuildContext context) {
     final appState = context.read<AppState>();
-    return appState.allMovies.peliculas.firstWhere(
+    return appState.todasLasPeliculas.peliculas.firstWhere(
       (pelicula) => pelicula.id == widget.pelicula.id,
       orElse: () => widget.pelicula,
     );
   }
 
-  // Muestra los datos, opiniones y acciones de la película.
+  // Muestra los datos, opiniones y acciones de la película
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final peliculaActual =
-        context.watch<AppState>().allMovies.peliculas.firstWhere(
+        context.watch<AppState>().todasLasPeliculas.peliculas.firstWhere(
               (pelicula) => pelicula.id == widget.pelicula.id,
               orElse: () => widget.pelicula,
             );

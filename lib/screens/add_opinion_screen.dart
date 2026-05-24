@@ -5,9 +5,10 @@ import '../repositories/opinion_repository.dart';
 class AddOpinionScreen extends StatefulWidget {
   final int peliculaId;
 
-  // Crea la pantalla para añadir una opinión.
+  // Crea la pantalla para añadir una opinión
   const AddOpinionScreen({super.key, required this.peliculaId});
 
+  // Crea el estado del formulario de opinión
   @override
   State<AddOpinionScreen> createState() => _AddOpinionScreenState();
 }
@@ -20,7 +21,7 @@ class _AddOpinionScreenState extends State<AddOpinionScreen> {
   final comentarioController = TextEditingController();
   int valoracion = 3;
 
-  // Valida el formulario y guarda la opinión.
+  // Valida el formulario y guarda la opinión
   Future<void> guardarOpinion() async {
     if (_formKey.currentState!.validate()) {
       final opinion = Opinion(
@@ -30,14 +31,14 @@ class _AddOpinionScreenState extends State<AddOpinionScreen> {
         valoracion: valoracion,
       );
 
-      await repository.insertOpinion(opinion);
+      await repository.insertarOpinion(opinion);
 
       if (!mounted) return;
       Navigator.pop(context);
     }
   }
 
-  // Libera los controladores de texto.
+  // Libera los controladores de texto
   @override
   void dispose() {
     autorController.dispose();
@@ -45,7 +46,7 @@ class _AddOpinionScreenState extends State<AddOpinionScreen> {
     super.dispose();
   }
 
-  // Crea la decoración básica de un campo.
+  // Crea la decoración básica de un campo
   InputDecoration deco(String label) {
     return InputDecoration(
       labelText: label,
@@ -53,7 +54,7 @@ class _AddOpinionScreenState extends State<AddOpinionScreen> {
     );
   }
 
-  // Muestra las estrellas para elegir valoración.
+  // Muestra las estrellas para elegir valoración
   Widget buildStarsSelector() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -75,7 +76,7 @@ class _AddOpinionScreenState extends State<AddOpinionScreen> {
     );
   }
 
-  // Muestra el formulario para crear una opinión.
+  // Muestra el formulario para crear una opinión
   @override
   Widget build(BuildContext context) {
     return Scaffold(

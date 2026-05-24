@@ -21,7 +21,7 @@ class AuthResponse {
   final AuthResult result;
   final AppUser? user;
 
-  // Guarda el resultado de autenticación y el usuario si existe.
+  // Guarda el resultado de autenticación y el usuario si existe
   const AuthResponse({
     required this.result,
     this.user,
@@ -32,24 +32,27 @@ class AuthRepository {
   final firebase_auth.FirebaseAuth? _firebaseAuthOverride;
   final FirebaseFirestore? _firestoreOverride;
 
+  // Crea el repositorio de autenticación con Firebase opcional para tests
   AuthRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
   })  : _firebaseAuthOverride = firebaseAuth,
         _firestoreOverride = firestore;
 
+  // Devuelve la instancia de Firebase Auth que se va a usar
   firebase_auth.FirebaseAuth get _firebaseAuth =>
       _firebaseAuthOverride ?? firebase_auth.FirebaseAuth.instance;
 
+  // Devuelve la instancia de Firestore que se va a usar
   FirebaseFirestore get _firestore =>
       _firestoreOverride ?? FirebaseFirestore.instance;
 
-  // Convierte la contraseña en un hash para no guardarla en claro.
+  // Convierte la contraseña en un hash para no guardarla en claro
   String _hashPassword(String password) {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-  // Genera un id numérico estable para mantener el contrato actual de la app.
+  // Genera un id numérico estable para mantener el contrato actual de la app
   int _stableUserId(String uid) {
     var hash = 2166136261;
     for (final codeUnit in uid.codeUnits) {
@@ -59,7 +62,7 @@ class AuthRepository {
     return hash;
   }
 
-  // Permite usar el nombre actual del formulario con Firebase Auth.
+  // Permite usar el nombre actual del formulario con Firebase Auth
   String _emailForName(String name) {
     final trimmedName = name.trim();
     if (trimmedName.contains('@')) return trimmedName.toLowerCase();
@@ -73,6 +76,7 @@ class AuthRepository {
     return '${safeName.isEmpty ? 'user' : safeName}@filmapp.localhost';
   }
 
+  // Crea un usuario de la app a partir del usuario de Firebase
   AppUser _userFromFirebaseUser(
     firebase_auth.User firebaseUser,
     Map<String, dynamic>? data,
@@ -87,6 +91,7 @@ class AuthRepository {
     );
   }
 
+  // Carga el usuario remoto o lo crea si todavía no existe
   Future<AppUser> _loadOrCreateRemoteUser(
     firebase_auth.User firebaseUser,
     String fallbackName,
@@ -112,7 +117,7 @@ class AuthRepository {
     return user;
   }
 
-  // Comprueba si el usuario existe y si la contraseña es correcta.
+  // Comprueba si el usuario existe y si la contraseña es correcta
   Future<AuthResponse> login(String name, String password) async {
     if (FirebaseService.isAvailable) {
       try {
@@ -165,7 +170,7 @@ class AuthRepository {
     );
   }
 
-  // Crea un usuario nuevo con idioma inicial y contraseña cifrada.
+  // Crea un usuario nuevo con idioma inicial y contraseña cifrada
   Future<AuthResponse> register(String name, String password) async {
     if (FirebaseService.isAvailable) {
       try {
@@ -225,7 +230,7 @@ class AuthRepository {
     }
   }
 
-  // Guarda el idioma elegido por el usuario y devuelve el usuario actualizado.
+  // Guarda el idioma elegido por el usuario y devuelve el usuario actualizado
   Future<AppUser> updateLanguage(AppUser user, String languageCode) async {
     if (FirebaseService.isAvailable && user.firebaseUid != null) {
       await _firestore.collection('usuarios').doc(user.firebaseUid).set({
@@ -247,7 +252,7 @@ class AuthRepository {
     return user.copyWith(languageCode: languageCode);
   }
 
-  // Cierra la sesión remota si Firebase está activo.
+  // Cierra la sesión remota si Firebase está activo
   Future<void> logout() async {
     if (FirebaseService.isAvailable) {
       await _firebaseAuth.signOut();

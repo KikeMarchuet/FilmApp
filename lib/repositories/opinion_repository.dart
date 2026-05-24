@@ -7,17 +7,20 @@ import '../services/firebase_service.dart';
 class OpinionRepository {
   final FirebaseFirestore? _firestoreOverride;
 
+  // Crea el repositorio de opiniones con Firestore opcional para tests
   OpinionRepository({FirebaseFirestore? firestore})
       : _firestoreOverride = firestore;
 
+  // Devuelve la instancia de Firestore que se va a usar
   FirebaseFirestore get _firestore =>
       _firestoreOverride ?? FirebaseFirestore.instance;
 
+  // Devuelve la colección remota de opiniones
   CollectionReference<Map<String, dynamic>> get _opiniones =>
       _firestore.collection('opiniones');
 
-  // Obtiene las opiniones de una película.
-  Future<List<Opinion>> getOpinionesByPelicula(int peliculaId) async {
+  // Obtiene las opiniones de una película
+  Future<List<Opinion>> obtenerOpinionesPorPelicula(int peliculaId) async {
     if (FirebaseService.isAvailable) {
       final snapshot = await _opiniones
           .where('pelicula_id', isEqualTo: peliculaId)
@@ -42,8 +45,8 @@ class OpinionRepository {
     return maps.map((map) => Opinion.fromMap(map)).toList();
   }
 
-  // Guarda una opinión nueva y devuelve su id.
-  Future<int> insertOpinion(Opinion opinion) async {
+  // Guarda una opinión nueva y devuelve su id
+  Future<int> insertarOpinion(Opinion opinion) async {
     if (FirebaseService.isAvailable) {
       final id = DateTime.now().microsecondsSinceEpoch;
       await _opiniones.doc(id.toString()).set({
@@ -58,8 +61,8 @@ class OpinionRepository {
     return await db.insert('opiniones', opinion.toMap());
   }
 
-  // Calcula la valoración media de una película.
-  Future<double> getMediaValoracion(int peliculaId) async {
+  // Calcula la valoración media de una película
+  Future<double> obtenerMediaValoracion(int peliculaId) async {
     if (FirebaseService.isAvailable) {
       final snapshot =
           await _opiniones.where('pelicula_id', isEqualTo: peliculaId).get();

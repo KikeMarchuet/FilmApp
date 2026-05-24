@@ -6,9 +6,10 @@ import '../repositories/auth_repository.dart';
 import '../state/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
-  // Crea la pantalla de inicio de sesión.
+  // Crea la pantalla de inicio de sesión
   const LoginScreen({super.key});
 
+  // Crea el estado del formulario de login
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -20,10 +21,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final confirmPasswordController = TextEditingController();
 
   bool isRegisterMode = false;
-  bool loading = false;
+  bool cargando = false;
   String? errorKey;
 
-  // Valida el formulario e intenta entrar o crear usuario.
+  // Valida el formulario e intenta entrar o crear usuario
   Future<void> submit() async {
     if (!formKey.currentState!.validate()) return;
 
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     setState(() {
-      loading = true;
+      cargando = true;
       errorKey = null;
     });
 
@@ -58,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!mounted) return;
     setState(() {
-      loading = false;
+      cargando = false;
     });
 
     if (response.result == AuthResult.success) return;
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // Cambia entre entrar y crear usuario.
+  // Cambia entre entrar y crear usuario
   void toggleMode() {
     setState(() {
       isRegisterMode = !isRegisterMode;
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  // Libera los controladores de texto.
+  // Libera los controladores de texto
   void dispose() {
     userController.dispose();
     passwordController.dispose();
@@ -91,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Muestra el formulario para entrar o crear usuario.
+  // Muestra el formulario para entrar o crear usuario
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -173,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
-                    onPressed: loading ? null : submit,
+                    onPressed: cargando ? null : submit,
                     icon: Icon(isRegisterMode ? Icons.person_add : Icons.login),
                     label: Text(
                       isRegisterMode
@@ -182,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: loading ? null : toggleMode,
+                    onPressed: cargando ? null : toggleMode,
                     child: Text(
                       isRegisterMode
                           ? l10n.text('alreadyHaveAccount')

@@ -6,16 +6,16 @@ import '../repositories/auth_repository.dart';
 import '../repositories/opinion_repository.dart';
 import '../repositories/pelicula_repository.dart';
 
-class MovieListState {
+class EstadoListaPeliculas {
   final List<Pelicula> peliculas;
   final Map<int, double> medias;
-  final bool loading;
+  final bool cargando;
 
-  // Guarda el estado visible de una lista de películas.
-  const MovieListState({
+  // Guarda el estado visible de una lista de películas
+  const EstadoListaPeliculas({
     this.peliculas = const [],
     this.medias = const {},
-    this.loading = false,
+    this.cargando = false,
   });
 }
 
@@ -24,7 +24,7 @@ class AppState extends ChangeNotifier {
   final PeliculaRepository peliculaRepository;
   final OpinionRepository opinionRepository;
 
-  // Crea el estado general y permite inyectar repositorios en tests.
+  // Crea el estado general y permite inyectar repositorios en tests
   AppState({
     AuthRepository? authRepository,
     PeliculaRepository? peliculaRepository,
@@ -35,16 +35,27 @@ class AppState extends ChangeNotifier {
 
   Locale _locale = const Locale('ca');
   AppUser? _user;
-  MovieListState _allMovies = const MovieListState(loading: true);
-  MovieListState _favoriteMovies = const MovieListState(loading: true);
+  EstadoListaPeliculas _todasLasPeliculas =
+      const EstadoListaPeliculas(cargando: true);
+  EstadoListaPeliculas _peliculasFavoritas =
+      const EstadoListaPeliculas(cargando: true);
 
+  // Devuelve el idioma activo
   Locale get locale => _locale;
+
+  // Devuelve el usuario activo
   AppUser? get user => _user;
-  MovieListState get allMovies => _allMovies;
-  MovieListState get favoriteMovies => _favoriteMovies;
+
+  // Devuelve el estado de todas las películas
+  EstadoListaPeliculas get todasLasPeliculas => _todasLasPeliculas;
+
+  // Devuelve el estado de las películas favoritas
+  EstadoListaPeliculas get peliculasFavoritas => _peliculasFavoritas;
+
+  // Indica si hay un usuario autenticado
   bool get isAuthenticated => _user != null;
 
-  // Intenta iniciar sesión y, si es correcto, carga los datos del usuario.
+  // Intenta iniciar sesión y, si es correcto, carga los datos del usuario
   Future<AuthResponse> login(String name, String password) async {
     final response = await authRepository.login(name, password);
     if (response.result == AuthResult.success && response.user != null) {
@@ -53,7 +64,7 @@ class AppState extends ChangeNotifier {
     return response;
   }
 
-  // Crea un usuario nuevo y, si se guarda bien, lo deja con sesión iniciada.
+  // Crea un usuario nuevo y, si se guarda bien, lo deja con sesión iniciada
   Future<AuthResponse> register(String name, String password) async {
     final response = await authRepository.register(name, password);
     if (response.result == AuthResult.success && response.user != null) {
@@ -62,26 +73,26 @@ class AppState extends ChangeNotifier {
     return response;
   }
 
-  // Establece el usuario activo, aplica su idioma y carga sus películas.
+  // Establece el usuario activo, aplica su idioma y carga sus películas
   Future<void> _setAuthenticatedUser(AppUser authenticatedUser) async {
     _user = authenticatedUser;
     _locale = Locale(authenticatedUser.languageCode);
-    _allMovies = const MovieListState(loading: true);
-    _favoriteMovies = const MovieListState(loading: true);
+    _todasLasPeliculas = const EstadoListaPeliculas(cargando: true);
+    _peliculasFavoritas = const EstadoListaPeliculas(cargando: true);
     notifyListeners();
-    await loadMovies();
+    await cargarPeliculas();
   }
 
-  // Cierra la sesión y limpia los datos cargados en memoria.
+  // Cierra la sesión y limpia los datos cargados en memoria
   Future<void> logout() async {
     await authRepository.logout();
     _user = null;
-    _allMovies = const MovieListState(loading: true);
-    _favoriteMovies = const MovieListState(loading: true);
+    _todasLasPeliculas = const EstadoListaPeliculas(cargando: true);
+    _peliculasFavoritas = const EstadoListaPeliculas(cargando: true);
     notifyListeners();
   }
 
-  // Cambia el idioma del usuario activo y lo guarda en la base de datos.
+  // Cambia el idioma del usuario activo y lo guarda en la base de datos
   Future<void> changeLocale(Locale newLocale) async {
     final currentUser = _user;
     if (currentUser == null) return;
@@ -95,81 +106,81 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Carga películas, favoritas y valoraciones del usuario activo.
-  Future<void> loadMovies() async {
+  // Carga películas, favoritas y valoraciones del usuario activo
+  Future<void> cargarPeliculas() async {
     final currentUser = _user;
     if (currentUser == null) return;
 
-    _allMovies = MovieListState(
-      peliculas: _allMovies.peliculas,
-      medias: _allMovies.medias,
-      loading: true,
+    _todasLasPeliculas = EstadoListaPeliculas(
+      peliculas: _todasLasPeliculas.peliculas,
+      medias: _todasLasPeliculas.medias,
+      cargando: true,
     );
-    _favoriteMovies = MovieListState(
-      peliculas: _favoriteMovies.peliculas,
-      medias: _favoriteMovies.medias,
-      loading: true,
+    _peliculasFavoritas = EstadoListaPeliculas(
+      peliculas: _peliculasFavoritas.peliculas,
+      medias: _peliculasFavoritas.medias,
+      cargando: true,
     );
     notifyListeners();
 
-    final all = await peliculaRepository.getPeliculas(currentUser.id);
-    final favorites =
-        await peliculaRepository.getPeliculasFavoritas(currentUser.id);
+    final todas = await peliculaRepository.obtenerPeliculas(currentUser.id);
+    final favoritas =
+        await peliculaRepository.obtenerPeliculasFavoritas(currentUser.id);
 
-    _allMovies = MovieListState(
-      peliculas: all,
-      medias: await _loadRatings(all),
+    _todasLasPeliculas = EstadoListaPeliculas(
+      peliculas: todas,
+      medias: await _cargarValoraciones(todas),
     );
-    _favoriteMovies = MovieListState(
-      peliculas: favorites,
-      medias: await _loadRatings(favorites),
+    _peliculasFavoritas = EstadoListaPeliculas(
+      peliculas: favoritas,
+      medias: await _cargarValoraciones(favoritas),
     );
     notifyListeners();
   }
 
-  // Guarda una película nueva y actualiza las listas.
-  Future<void> addMovie(Pelicula pelicula) async {
-    await peliculaRepository.insertPelicula(pelicula);
-    await loadMovies();
+  // Guarda una película nueva y actualiza las listas
+  Future<void> anadirPelicula(Pelicula pelicula) async {
+    await peliculaRepository.insertarPelicula(pelicula);
+    await cargarPeliculas();
   }
 
-  // Actualiza una película existente y refresca las listas.
-  Future<void> updateMovie(Pelicula pelicula) async {
+  // Actualiza una película existente y refresca las listas
+  Future<void> actualizarPelicula(Pelicula pelicula) async {
     if (pelicula.id == null) return;
 
-    await peliculaRepository.updatePelicula(pelicula);
-    await loadMovies();
+    await peliculaRepository.actualizarPelicula(pelicula);
+    await cargarPeliculas();
   }
 
-  // Borra una película y actualiza las listas.
-  Future<void> deleteMovie(Pelicula pelicula) async {
+  // Borra una película y actualiza las listas
+  Future<void> eliminarPelicula(Pelicula pelicula) async {
     final id = pelicula.id;
     if (id == null) return;
 
-    await peliculaRepository.deletePelicula(id);
-    await loadMovies();
+    await peliculaRepository.eliminarPelicula(id);
+    await cargarPeliculas();
   }
 
-  // Marca o desmarca una película como favorita del usuario activo.
-  Future<void> toggleFavorite(Pelicula pelicula) async {
+  // Marca o desmarca una película como favorita del usuario activo
+  Future<void> cambiarFavorita(Pelicula pelicula) async {
     final currentUser = _user;
     if (currentUser == null || pelicula.id == null) return;
 
-    await peliculaRepository.updateFavorita(
+    await peliculaRepository.actualizarFavorita(
       currentUser.id,
       pelicula.id!,
       !pelicula.favorita,
     );
-    await loadMovies();
+    await cargarPeliculas();
   }
 
-  // Calcula la valoración media de cada película recibida.
-  Future<Map<int, double>> _loadRatings(List<Pelicula> peliculas) async {
+  // Calcula la valoración media de cada película recibida
+  Future<Map<int, double>> _cargarValoraciones(List<Pelicula> peliculas) async {
     final medias = <int, double>{};
     for (final pelicula in peliculas) {
       final id = pelicula.id;
       if (id != null) {
-        medias[id] = await opinionRepository.getMediaValoracion(id);
+        medias[id] = await opinionRepository.obtenerMediaValoracion(id);
       }
     }
     return medias;

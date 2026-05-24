@@ -11,7 +11,7 @@ class AddPeliculaScreen extends StatefulWidget {
   final bool closeAfterSave;
   final Pelicula? pelicula;
 
-  // Crea la pantalla para añadir o editar una película.
+  // Crea la pantalla para añadir o editar una película
   const AddPeliculaScreen({
     super.key,
     this.user,
@@ -19,6 +19,7 @@ class AddPeliculaScreen extends StatefulWidget {
     this.pelicula,
   });
 
+  // Crea el estado del formulario de película
   @override
   State<AddPeliculaScreen> createState() => _AddPeliculaScreenState();
 }
@@ -39,9 +40,10 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
   final sinopsisController = TextEditingController();
   String caratulaSeleccionada = caratulasDisponibles.first;
 
+  // Indica si el formulario está editando una película
   bool get esEdicion => widget.pelicula != null;
 
-  // Carga los datos iniciales cuando se está editando una película.
+  // Carga los datos iniciales cuando se está editando una película
   @override
   void initState() {
     super.initState();
@@ -58,7 +60,7 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     }
   }
 
-  // Valida el formulario y guarda la película.
+  // Valida el formulario y guarda la película
   Future<void> guardarPelicula() async {
     if (_formKey.currentState!.validate()) {
       final pelicula = Pelicula(
@@ -73,9 +75,9 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
       );
 
       if (esEdicion) {
-        await context.read<AppState>().updateMovie(pelicula);
+        await context.read<AppState>().actualizarPelicula(pelicula);
       } else {
-        await context.read<AppState>().addMovie(pelicula);
+        await context.read<AppState>().anadirPelicula(pelicula);
       }
 
       if (!mounted) return;
@@ -101,7 +103,7 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     }
   }
 
-  // Libera los controladores de texto.
+  // Libera los controladores de texto
   @override
   void dispose() {
     tituloController.dispose();
@@ -112,7 +114,7 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     super.dispose();
   }
 
-  // Crea la decoración básica de un campo.
+  // Crea la decoración básica de un campo
   InputDecoration deco(String label) {
     return InputDecoration(
       labelText: label,
@@ -120,7 +122,7 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     );
   }
 
-  // Muestra el formulario para crear o editar una película.
+  // Muestra el formulario para crear o editar una película
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

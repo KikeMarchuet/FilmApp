@@ -8,21 +8,27 @@ import '../services/firebase_service.dart';
 class PeliculaRepository {
   final FirebaseFirestore? _firestoreOverride;
 
+  // Crea el repositorio de películas con Firestore opcional para tests
   PeliculaRepository({FirebaseFirestore? firestore})
       : _firestoreOverride = firestore;
 
+  // Devuelve la instancia de Firestore que se va a usar
   FirebaseFirestore get _firestore =>
       _firestoreOverride ?? FirebaseFirestore.instance;
 
+  // Devuelve la colección remota de películas
   CollectionReference<Map<String, dynamic>> get _peliculas =>
       _firestore.collection('peliculas');
 
+  // Devuelve la colección remota de favoritas
   CollectionReference<Map<String, dynamic>> get _favoritas =>
       _firestore.collection('peliculas_favoritas');
 
+  // Devuelve la colección remota de opiniones
   CollectionReference<Map<String, dynamic>> get _opiniones =>
       _firestore.collection('opiniones');
 
+  // Crea datos remotos iniciales si Firestore está vacío
   Future<void> _ensureRemoteSeedData() async {
     final existing = await _peliculas.limit(1).get();
     if (existing.docs.isNotEmpty) return;
@@ -96,6 +102,7 @@ class PeliculaRepository {
     await batch.commit();
   }
 
+  // Obtiene los ids de películas favoritas de un usuario en Firestore
   Future<Set<int>> _getRemoteFavoriteIds(int usuarioId) async {
     final snapshot =
         await _favoritas.where('usuario_id', isEqualTo: usuarioId).get();
@@ -104,6 +111,7 @@ class PeliculaRepository {
         .toSet();
   }
 
+  // Convierte un documento remoto en una película de la app
   Pelicula _remoteMovieFromDoc(
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
     Set<int> favoriteIds,
@@ -117,8 +125,8 @@ class PeliculaRepository {
     return Pelicula.fromMap(data);
   }
 
-  // Obtiene todas las películas y marca cuáles son favoritas del usuario.
-  Future<List<Pelicula>> getPeliculas(int usuarioId) async {
+  // Obtiene todas las películas y marca cuáles son favoritas del usuario
+  Future<List<Pelicula>> obtenerPeliculas(int usuarioId) async {
     if (FirebaseService.isAvailable) {
       await _ensureRemoteSeedData();
       final favoriteIds = await _getRemoteFavoriteIds(usuarioId);
@@ -141,12 +149,12 @@ class PeliculaRepository {
     return maps.map((map) => Pelicula.fromMap(map)).toList();
   }
 
-  // Obtiene solo las películas favoritas del usuario.
-  Future<List<Pelicula>> getPeliculasFavoritas(int usuarioId) async {
+  // Obtiene solo las películas favoritas del usuario
+  Future<List<Pelicula>> obtenerPeliculasFavoritas(int usuarioId) async {
     if (FirebaseService.isAvailable) {
       await _ensureRemoteSeedData();
       final favoriteIds = await _getRemoteFavoriteIds(usuarioId);
-      final peliculas = await getPeliculas(usuarioId);
+      final peliculas = await obtenerPeliculas(usuarioId);
       return peliculas
           .where((pelicula) => pelicula.id != null)
           .where((pelicula) => favoriteIds.contains(pelicula.id))
@@ -165,8 +173,8 @@ class PeliculaRepository {
     return maps.map((map) => Pelicula.fromMap(map)).toList();
   }
 
-  // Guarda una película nueva y devuelve su id.
-  Future<int> insertPelicula(Pelicula pelicula) async {
+  // Guarda una película nueva y devuelve su id
+  Future<int> insertarPelicula(Pelicula pelicula) async {
     if (FirebaseService.isAvailable) {
       final id = DateTime.now().microsecondsSinceEpoch;
       await _peliculas.doc(id.toString()).set({
@@ -180,8 +188,8 @@ class PeliculaRepository {
     return await db.insert('peliculas', pelicula.toMap());
   }
 
-  // Actualiza los datos principales de una película existente.
-  Future<void> updatePelicula(Pelicula pelicula) async {
+  // Actualiza los datos principales de una película existente
+  Future<void> actualizarPelicula(Pelicula pelicula) async {
     if (FirebaseService.isAvailable) {
       final id = pelicula.id;
       if (id == null) return;
@@ -198,8 +206,8 @@ class PeliculaRepository {
     );
   }
 
-  // Elimina una película y sus datos relacionados.
-  Future<void> deletePelicula(int id) async {
+  // Elimina una película y sus datos relacionados
+  Future<void> eliminarPelicula(int id) async {
     if (FirebaseService.isAvailable) {
       final batch = _firestore.batch();
       final favoritasSnapshot =
@@ -238,8 +246,8 @@ class PeliculaRepository {
     });
   }
 
-  // Marca o desmarca una película como favorita del usuario.
-  Future<void> updateFavorita(
+  // Marca o desmarca una película como favorita del usuario
+  Future<void> actualizarFavorita(
       int usuarioId, int peliculaId, bool favorita) async {
     if (FirebaseService.isAvailable) {
       final favoriteRef = _favoritas.doc('${usuarioId}_$peliculaId');
@@ -276,7 +284,7 @@ class PeliculaRepository {
     );
   }
 
-  // Busca una película por su id.
+  // Busca una película por su id
   Future<Pelicula?> getPeliculaById(int id) async {
     if (FirebaseService.isAvailable) {
       final snapshot = await _peliculas.doc(id.toString()).get();

@@ -6,7 +6,7 @@ class CaratulaImage extends StatelessWidget {
   final double height;
   final BoxFit fit;
 
-  // Crea una imagen de carátula con fallback si no existe.
+  // Crea una imagen de carátula con fallback si no existe
   const CaratulaImage({
     super.key,
     required this.path,
@@ -15,7 +15,7 @@ class CaratulaImage extends StatelessWidget {
     this.fit = BoxFit.cover,
   });
 
-  // Muestra la imagen o un bloque neutro si falla la carga.
+  // Muestra la imagen o un bloque neutro si falla la carga
   @override
   Widget build(BuildContext context) {
     return Image.asset(

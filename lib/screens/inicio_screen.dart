@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 class InicioScreen extends StatefulWidget {
   final VoidCallback onFinished;
 
-  // Crea la pantalla inicial temporal de la app.
+  // Crea la pantalla inicial temporal de la app
   const InicioScreen({
     super.key,
     required this.onFinished,
   });
 
+  // Crea el estado de la pantalla inicial
   @override
   State<InicioScreen> createState() => _InicioScreenState();
 }
@@ -19,20 +20,20 @@ class _InicioScreenState extends State<InicioScreen> {
   Timer? timer;
 
   @override
-  // Espera unos segundos antes de continuar.
+  // Espera unos segundos antes de continuar
   void initState() {
     super.initState();
     timer = Timer(const Duration(seconds: 6), widget.onFinished);
   }
 
   @override
-  // Cancela el temporizador si la pantalla se destruye.
+  // Cancela el temporizador si la pantalla se destruye
   void dispose() {
     timer?.cancel();
     super.dispose();
   }
 
-  // Muestra la marca de la app mientras carga.
+  // Muestra la marca de la app mientras carga
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +105,7 @@ class _InicioScreenState extends State<InicioScreen> {
     );
   }
 
-  // Crea una carátula inclinada para la presentación.
+  // Crea una carátula inclinada para la presentación
   Widget _poster(String path, double x, double y, double angle, double width) {
     return Transform.translate(
       offset: Offset(x, y),
