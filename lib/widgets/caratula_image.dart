@@ -18,24 +18,41 @@ class CaratulaImage extends StatelessWidget {
   // Muestra la imagen o un bloque neutro si falla la carga
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      path,
+    final image = path.startsWith('http')
+        ? Image.network(
+            path,
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: _buildFallback,
+          )
+        : Image.asset(
+            path,
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: _buildFallback,
+          );
+
+    return image;
+  }
+
+  // Muestra un bloque neutro si la carátula no carga
+  Widget _buildFallback(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  ) {
+    return Container(
       width: width,
       height: height,
-      fit: fit,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: width,
-          height: height,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          alignment: Alignment.center,
-          child: Icon(
-            Icons.movie_outlined,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            size: 36,
-          ),
-        );
-      },
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.movie_outlined,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        size: 36,
+      ),
     );
   }
 }

@@ -1,9 +1,14 @@
+import 'dart:typed_data';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/app_user.dart';
 import '../models/pelicula.dart';
+import '../services/firebase_service.dart';
 import '../state/app_state.dart';
 
 class AddPeliculaScreen extends StatefulWidget {
@@ -39,6 +44,11 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
   final generoController = TextEditingController();
   final sinopsisController = TextEditingController();
   String caratulaSeleccionada = caratulasDisponibles.first;
+  final ImagePicker _imagePicker = ImagePicker();
+  Uint8List? imagenSeleccionadaBytes;
+  String? imagenSeleccionadaNombre;
+  String? imagenSeleccionadaMimeType;
+  bool guardando = false;
 
   // Indica si el formulario está editando una película
   bool get esEdicion => widget.pelicula != null;
@@ -57,12 +67,79 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
     sinopsisController.text = pelicula.sinopsis;
     if (caratulasDisponibles.contains(pelicula.caratula)) {
       caratulaSeleccionada = pelicula.caratula;
+    } else {
+      caratulaSeleccionada = pelicula.caratula;
     }
+  }
+
+  // Permite elegir una imagen desde la galería o archivos del dispositivo
+  Future<void> seleccionarCaratula() async {
+    final imagen = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1200,
+      imageQuality: 85,
+    );
+    if (imagen == null) return;
+
+    final bytes = await imagen.readAsBytes();
+    setState(() {
+      imagenSeleccionadaBytes = bytes;
+      imagenSeleccionadaNombre = imagen.name;
+      imagenSeleccionadaMimeType = imagen.mimeType;
+    });
+  }
+
+  // Sube la imagen elegida a Firebase Storage y devuelve su URL pública
+  Future<String> subirCaratulaSeleccionada() async {
+    final bytes = imagenSeleccionadaBytes;
+    if (bytes == null) return caratulaSeleccionada;
+    if (!FirebaseService.isAvailable) {
+      throw Exception('Firebase no está disponible para subir la carátula');
+    }
+
+    final extension = (imagenSeleccionadaNombre?.split('.').last ?? 'jpg')
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]'), '');
+    final nombreSeguro = DateTime.now().microsecondsSinceEpoch.toString();
+    final referencia = FirebaseStorage.instance
+        .ref()
+        .child('caratulas')
+        .child('$nombreSeguro.${extension.isEmpty ? 'jpg' : extension}');
+
+    await referencia.putData(
+      bytes,
+      SettableMetadata(
+        contentType: imagenSeleccionadaMimeType ?? 'image/jpeg',
+      ),
+    );
+    return referencia.getDownloadURL();
   }
 
   // Valida el formulario y guarda la película
   Future<void> guardarPelicula() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && !guardando) {
+      final appState = context.read<AppState>();
+
+      setState(() {
+        guardando = true;
+      });
+
+      String caratula;
+      try {
+        caratula = await subirCaratulaSeleccionada();
+      } catch (_) {
+        if (!mounted) return;
+        setState(() {
+          guardando = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se ha podido subir la carátula'),
+          ),
+        );
+        return;
+      }
+
       final pelicula = Pelicula(
         id: widget.pelicula?.id,
         titulo: tituloController.text.trim(),
@@ -70,14 +147,14 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
         anio: int.parse(anioController.text.trim()),
         genero: generoController.text.trim(),
         sinopsis: sinopsisController.text.trim(),
-        caratula: caratulaSeleccionada,
+        caratula: caratula,
         favorita: widget.pelicula?.favorita ?? false,
       );
 
       if (esEdicion) {
-        await context.read<AppState>().actualizarPelicula(pelicula);
+        await appState.actualizarPelicula(pelicula);
       } else {
-        await context.read<AppState>().anadirPelicula(pelicula);
+        await appState.anadirPelicula(pelicula);
       }
 
       if (!mounted) return;
@@ -94,6 +171,10 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
       sinopsisController.clear();
       setState(() {
         caratulaSeleccionada = caratulasDisponibles.first;
+        imagenSeleccionadaBytes = null;
+        imagenSeleccionadaNombre = null;
+        imagenSeleccionadaMimeType = null;
+        guardando = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -195,7 +276,9 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: caratulaSeleccionada,
+                value: caratulasDisponibles.contains(caratulaSeleccionada)
+                    ? caratulaSeleccionada
+                    : null,
                 decoration: deco('Carátula'),
                 items: caratulasDisponibles.map((path) {
                   return DropdownMenuItem(
@@ -210,11 +293,36 @@ class _AddPeliculaScreenState extends State<AddPeliculaScreen> {
                   });
                 },
               ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: guardando ? null : seleccionarCaratula,
+                icon: const Icon(Icons.photo_library_outlined),
+                label: Text(
+                  imagenSeleccionadaNombre == null
+                      ? 'Elegir imagen'
+                      : imagenSeleccionadaNombre!,
+                ),
+              ),
+              if (imagenSeleccionadaBytes != null) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(
+                    imagenSeleccionadaBytes!,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: guardarPelicula,
+                onPressed: guardando ? null : guardarPelicula,
                 child: Text(
-                  esEdicion ? l10n.text('saveChanges') : 'Guardar película',
+                  guardando
+                      ? 'Guardando...'
+                      : esEdicion
+                          ? l10n.text('saveChanges')
+                          : 'Guardar película',
                 ),
               ),
             ],
